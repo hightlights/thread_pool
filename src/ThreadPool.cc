@@ -64,7 +64,6 @@ ThreadPool::WapperPtr ThreadPool::take()
     task_ptr = std::move(wapper_tasks_.front());
     wapper_tasks_.pop_front();
   }
-  LOG("thread %lu get a task", std::this_thread::get_id());
   return std::move(task_ptr);
 }
 
