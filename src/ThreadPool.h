@@ -24,8 +24,8 @@ class ThreadPool
   void start(int numThreads);
   void stop();
 
-  template<typename T>
-  void push(T pkg_task);
+  template<typename Func, typename ... Args>
+  auto push_task(Func callable, Args ... args);
 
  private:
 
@@ -57,16 +57,28 @@ class ThreadPool
   void run();
   WapperPtr take();
   void static ThreadPtrJoin(ThreadPtr& ptr);
+  
+  template<typename T>
+  void push(T pkg_task);
 
   std::mutex mutex_;
   std::condition_variable cond_;
   std::string name_;
   std::vector<ThreadPtr> threads_;
-  // std::deque<Task> queue_;
-  // std::deque<PkgTaskPtr> tasks_;
   std::deque<WapperPtr> wapper_tasks_;
   bool running_;
 };
+
+//Task Wrapper
+template<typename T>
+ThreadPool::TaskWrapper<T>::TaskWrapper(T&& pkg_task):
+             data_(std::move(pkg_task)){};
+
+template<typename T>
+void ThreadPool::TaskWrapper<T>:: excute(){
+  data_();
+}
+
 
 //template function should be defined in the same file with declaration.
 template<typename T>
@@ -83,14 +95,19 @@ void ThreadPool::push(T pkg_task)
   }
 }
 
-//Task Wrapper
-template<typename T>
-ThreadPool::TaskWrapper<T>::TaskWrapper(T&& pkg_task):
-             data_(std::move(pkg_task)){};
-
-template<typename T>
-void ThreadPool::TaskWrapper<T>:: excute(){
-  data_();
+template<typename Func, typename ... Args>
+auto ThreadPool::push_task(Func callable, Args ... args) {
+  using RetureTpy = decltype(
+                    callable(std::forward<Args>(args)...)
+                    );
+                    
+  std::function<RetureTpy()> func{std::bind(callable, std::forward<Args>(args)...)};
+  std::packaged_task<RetureTpy()> 
+                    pkg_task{std::move(func)};
+  auto return_val = pkg_task.get_future();
+  push(std::move(pkg_task));
+  return std::move(return_val);
+  
 }
 
 #endif

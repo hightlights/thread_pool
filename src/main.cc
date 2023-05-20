@@ -26,6 +26,10 @@ int test_ret(int a, int b)
   return 0;
 }
 
+void temp(){
+  
+}
+
 int main()
 {
   ThreadPool pool(std::string("test"));
@@ -38,10 +42,13 @@ int main()
   int i = 0;
   for(int j = 0; j < thread_nums - 1; ++j, i += spec)
   {
-    std::packaged_task<int()> 
-                       pkg_task{std::bind(parallel_sum , vec, i, i + spec)};
-    res.push_back(pkg_task.get_future());
-    pool.push(std::move(pkg_task));
+    res.push_back(
+                 pool.push_task(parallel_sum , 
+                                vec, 
+                                i, 
+                                i + spec
+                                )
+                );
   }
   int result = parallel_sum(vec, i, vec.size());
   //get results

@@ -5,7 +5,7 @@
 #include <stdarg.h>
 
 
-#define DEBUG
+//#define DEBUG
 #ifdef DEBUG
     #define LOG(...) \
     do { \
