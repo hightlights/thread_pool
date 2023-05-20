@@ -74,6 +74,7 @@ template<typename T>
 ThreadPool::TaskWrapper<T>::TaskWrapper(T&& pkg_task):
              data_(std::move(pkg_task)){};
 
+
 template<typename T>
 void ThreadPool::TaskWrapper<T>:: excute(){
   data_();
@@ -100,14 +101,14 @@ auto ThreadPool::push_task(Func callable, Args ... args) {
   using RetureTpy = decltype(
                     callable(std::forward<Args>(args)...)
                     );
-                    
-  std::function<RetureTpy()> func{std::bind(callable, std::forward<Args>(args)...)};
+
+  std::function<RetureTpy()> func{std::bind(callable, 
+                                            std::forward<Args>(args)...)};
   std::packaged_task<RetureTpy()> 
                     pkg_task{std::move(func)};
   auto return_val = pkg_task.get_future();
   push(std::move(pkg_task));
   return std::move(return_val);
-  
 }
 
 #endif
