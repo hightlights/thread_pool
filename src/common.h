@@ -9,7 +9,7 @@
 #ifdef DEBUG
     #define LOG(...) \
     do { \
-        printf("[ %s : %d ] Massage : ", __FILE__, __LINE__); \
+        printf("[ %s:%d ] Massage : ", __FILE__, __LINE__); \
         printf(__VA_ARGS__); \
         printf("\n"); \
     } while (0)

@@ -8,7 +8,6 @@
 #include <condition_variable>
 #include <thread>
 #include <future>
-#include <iostream>
 #include <functional>
 
 #include "common.h"
@@ -16,7 +15,7 @@
 class ThreadPool
 {
  public:
-  typedef std::unique_ptr<std::thread> ThreadPtr;
+  using ThreadPtr = std::unique_ptr<std::thread>;
 
   explicit ThreadPool(const std::string& name = std::string());
   ~ThreadPool();
@@ -25,10 +24,9 @@ class ThreadPool
   void stop();
 
   template<typename Func, typename ... Args>
-  auto push_task(Func callable, Args ... args);
+  auto pushTask(Func callable, Args ... args);
 
  private:
-
   class BaseTaskWrapper
   {
    public:
@@ -50,12 +48,13 @@ class ThreadPool
     T data_;
   };
 
-  typedef std::unique_ptr<BaseTaskWrapper> WapperPtr;
-  
+  using WapperPtr = std::unique_ptr<BaseTaskWrapper>;
+ 
   ThreadPool(ThreadPool&) = delete;
   ThreadPool& operator=(ThreadPool&) = delete;
+  
   void run();
-  WapperPtr take();
+  WapperPtr takeTask();
   void static ThreadPtrJoin(ThreadPtr& ptr);
   
   template<typename T>
@@ -71,15 +70,15 @@ class ThreadPool
 
 //Task Wrapper
 template<typename T>
-ThreadPool::TaskWrapper<T>::TaskWrapper(T&& pkg_task):
-             data_(std::move(pkg_task)){};
+ThreadPool::TaskWrapper<T>::TaskWrapper(T&& pkg_task)
+  : data_(std::move(pkg_task)){};
 
 
 template<typename T>
-void ThreadPool::TaskWrapper<T>:: excute(){
+void ThreadPool::TaskWrapper<T>:: excute()
+{
   data_();
 }
-
 
 //template function should be defined in the same file with declaration.
 template<typename T>
@@ -97,14 +96,14 @@ void ThreadPool::push(T pkg_task)
 }
 
 template<typename Func, typename ... Args>
-auto ThreadPool::push_task(Func callable, Args ... args) {
-  using RetureTpy = decltype(
+auto ThreadPool::pushTask(Func callable, Args ... args) {
+  using RetureType = decltype(
                     callable(std::forward<Args>(args)...)
                     );
 
-  std::function<RetureTpy()> func{std::bind(callable, 
-                                            std::forward<Args>(args)...)};
-  std::packaged_task<RetureTpy()> 
+  std::function<RetureType()> func{std::bind(callable, 
+                                             std::forward<Args>(args)...)};
+  std::packaged_task<RetureType()> 
                     pkg_task{std::move(func)};
   auto return_val = pkg_task.get_future();
   push(std::move(pkg_task));

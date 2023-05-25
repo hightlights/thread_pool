@@ -42,7 +42,7 @@ int main()
   int i = 0;
   for(int j = 0; j < thread_nums - 1; ++j, i += spec)
   {
-    res.push_back(pool.push_task(parallel_sum , 
+    res.push_back(pool.pushTask(parallel_sum , 
                                  vec, i, i + spec));
   }
   int result = parallel_sum(vec, i, vec.size());
@@ -51,4 +51,5 @@ int main()
     result += fu.get();
   }
   std::cout << result << std::endl; 
+  LOG("hello %d", 2);
 }
