@@ -35,7 +35,7 @@ int main()
   ThreadPool pool(std::string("test"));
   int thread_nums = 5; 
   pool.start(thread_nums);
-  std::vector<int> vec(100000, 1);
+  std::vector<int> vec(10000000, 1);
   int spec = vec.size() / thread_nums;
   std::vector<std::future<int>> res;
   //push to thread pool
