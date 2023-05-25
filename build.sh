@@ -16,9 +16,9 @@ function build_help(){
 }
 
 function target_link(){
-    if [ ! -f "threadpool" ]; then
+   if [ ! -f "threadpool" ]; then
         ln -s $cur_dir/build/bin/threadpool threadpool
-    fi
+    fi 
 }
 
 # main
@@ -36,6 +36,8 @@ elif [ $1 = "--b" ]; then
 elif [ $1 = "--r" ]; then
     cmake .
     make
+    cd ..
+    target_link
 elif [ $1 = "--c" ]; then
     cd ..
     rm -rf build
