@@ -28,7 +28,7 @@ void ThreadPool::start(int numThreads)
   for (int i = 0; i < numThreads; ++i)
   {
     threads_.push_back(std::move(ThreadPtr(new std::thread(
-           std::bind(&ThreadPool::run, this)))));
+                       std::bind(&ThreadPool::run, this)))));
   }
 }
 
@@ -50,7 +50,7 @@ void ThreadPool::stop()
 }
 
 
-ThreadPool::WapperPtr ThreadPool::take()
+ThreadPool::WapperPtr ThreadPool::takeTask()
 {
   std::unique_lock<std::mutex> lck(mutex_);
   //in case of spurious wakeup
@@ -73,7 +73,7 @@ void ThreadPool::run()
   {
     while (running_)
     {
-      WapperPtr task_ptr(std::move(take()));
+      WapperPtr task_ptr(std::move(takeTask()));
       if(nullptr != task_ptr)
       {
         task_ptr->excute();
