@@ -1,5 +1,5 @@
-#ifndef BASE_THREADPOOL_H
-#define BASE_THREADPOOL_H
+#ifndef THREADPOOL_H
+#define THREADPOOL_H
 
 #include <vector>
 #include <deque>
@@ -24,7 +24,7 @@ class ThreadPool
   void stop();
 
   template<typename Func, typename ... Args>
-  auto pushTask(Func callable, Args ... args);
+  auto pushTask(Func callable, Args&& ... args);
 
  private:
   class BaseTaskWrapper
@@ -96,18 +96,17 @@ void ThreadPool::push(T pkg_task)
 }
 
 template<typename Func, typename ... Args>
-auto ThreadPool::pushTask(Func callable, Args ... args) {
+auto ThreadPool::pushTask(Func callable, Args&& ... args) {
   using RetureType = decltype(
                     callable(std::forward<Args>(args)...)
                     );
-
   std::function<RetureType()> func{std::bind(callable, 
                                              std::forward<Args>(args)...)};
   std::packaged_task<RetureType()> 
                     pkg_task{std::move(func)};
   auto return_val = pkg_task.get_future();
   push(std::move(pkg_task));
-  return std::move(return_val);
+  return return_val;
 }
 
 #endif

@@ -64,7 +64,7 @@ ThreadPool::WapperPtr ThreadPool::takeTask()
     task_ptr = std::move(wapper_tasks_.front());
     wapper_tasks_.pop_front();
   }
-  return std::move(task_ptr);
+  return task_ptr;
 }
 
 void ThreadPool::run()

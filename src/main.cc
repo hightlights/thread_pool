@@ -26,10 +26,6 @@ int test_ret(int a, int b)
   return 0;
 }
 
-void temp(){
-  
-}
-
 int main()
 {
   ThreadPool pool(std::string("test"));
@@ -51,5 +47,6 @@ int main()
     result += fu.get();
   }
   std::cout << result << std::endl; 
+  std::this_thread::sleep_for(std::chrono::milliseconds(300000));
   LOG("hello %d", 2);
 }
